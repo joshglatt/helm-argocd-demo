@@ -13,7 +13,7 @@ database:
       memory: 256Mi
 
 backend:
-  replicas: 4
+  replicas: 2
   image:
     repository: adminer
     tag: "4"
@@ -27,7 +27,7 @@ backend:
       memory: 128Mi
 
 frontend:
-  replicas: 4
+  replicas: 2
   image:
     repository: nginx
     tag: "1.25"
