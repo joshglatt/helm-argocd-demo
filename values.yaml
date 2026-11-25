@@ -1,0 +1,86 @@
+# Default values. Filled in step by step as templates are parameterized.
+
+database:
+  image:
+    tag: "16"
+  storage: 1Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+backend:
+  replicas: 2
+  image:
+    repository: adminer
+    tag: "4"
+  dbServer: database:5432
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+frontend:
+  replicas: 2
+  image:
+    repository: nginx
+    tag: "1.25"
+  backendAddr: backend:8080
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+
+# One Service per entry; rendered with range in templates/service.yaml
+services:
+  - name: frontend
+    port: 80
+    portName: http
+  - name: backend
+    port: 8080
+    portName: http
+    sessionAffinity: ClientIP   # Adminer keeps login sessions per pod
+  - name: database
+    port: 5432
+    portName: db
+
+# ServiceAccounts for the three tiers (not bound to any Role)
+serviceAccounts:
+  - frontend
+  - backend
+  - database
+
+# Read-only reviewer account; set enabled: false to omit all three objects
+reviewer:
+  enabled: true
+  rules:
+    - apiGroups: [""]
+      resources: ["pods", "services"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["apps"]
+      resources: ["deployments"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["discovery.k8s.io"]
+      resources: ["endpointslices"]
+      verbs: ["get", "list", "watch"]
+
+# Create the Namespace from the chart (normally use helm --create-namespace instead)
+namespace:
+  create: false
+
+# The Secret is created by hand with kubectl; the chart only references it by name.
+# Set create: true only for throwaway testing -- never commit real credentials.
+secret:
+  create: false
+  name: db-credentials
+  username: CHANGE_ME
+  password: CHANGE_ME

@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: {{ .Release.Namespace }}
+data:
+  # Backend address, injected as an env var and substituted into the nginx template
+  BACKEND_ADDR: {{ .Values.frontend.backendAddr | quote }}
+  # Mounted as a file; the nginx image renders *.template files with envsubst on start
+  default.conf.template: |
+    server {
+      listen 80;
+      location / {
+        proxy_pass http://${BACKEND_ADDR};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "three-tier-app.selectorLabels" "frontend" | nindent 4 }}
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      {{- include "three-tier-app.selectorLabels" "frontend" | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "three-tier-app.selectorLabels" "frontend" | nindent 8 }}
+    spec:
+      serviceAccountName: frontend
+      containers:
+        - name: nginx
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          ports:
+            - name: http
+              containerPort: 80
+          env:
+            - name: BACKEND_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: frontend-config
+                  key: BACKEND_ADDR
+          volumeMounts:
+            - name: nginx-template
+              mountPath: /etc/nginx/templates
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.frontend.resources | nindent 12 }}
+      volumes:
+        - name: nginx-template
+          configMap:
+            name: frontend-config
+            items:
+              - key: default.conf.template
+                path: default.conf.template

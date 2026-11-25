@@ -1,0 +1,21 @@
+{{- range .Values.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "three-tier-app.selectorLabels" .name | nindent 4 }}
+spec:
+  type: ClusterIP
+  {{- if .sessionAffinity }}
+  sessionAffinity: {{ .sessionAffinity }}
+  {{- end }}
+  selector:
+    {{- include "three-tier-app.selectorLabels" .name | nindent 4 }}
+  ports:
+    - name: {{ .portName }}
+      port: {{ .port }}
+      targetPort: {{ .portName }}
+{{- end }}
