@@ -1,0 +1,14 @@
+values.yaml
+  h_68d990d167bd47 16,30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c43c36b9f84544c00319150fec42aa6e6b6536c2",
+  "prompts": {},
+  "humans": {
+    "h_68d990d167bd47": {
+      "author": "joshglatt <joshgl@papayaglobal.com>"
+    }
+  }
+}
