@@ -1,0 +1,34 @@
+Chart.yaml
+  h_68d990d167bd47 1-6
+templates/_helpers.tpl
+  h_68d990d167bd47 1-8
+templates/backend.yaml
+  h_68d990d167bd47 1-64
+templates/database.yaml
+  h_68d990d167bd47 1-71
+templates/frontend.yaml
+  h_68d990d167bd47 1-74
+templates/namespace.yaml
+  h_68d990d167bd47 1-6
+templates/rbac.yaml
+  h_68d990d167bd47 1-38
+templates/secret.yaml
+  h_68d990d167bd47 1-11
+templates/service.yaml
+  h_68d990d167bd47 1-21
+values-prod.yaml
+  h_68d990d167bd47 1-20
+values.yaml
+  h_68d990d167bd47 1-86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bef9a0a8dcc51c4e377f8ad034a6bdfc41c65087",
+  "prompts": {},
+  "humans": {
+    "h_68d990d167bd47": {
+      "author": "joshglatt <joshgl@papayaglobal.com>"
+    }
+  }
+}
